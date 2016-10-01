@@ -5,20 +5,28 @@
   remote_user: root
   tasks:
   
-  - name: Configure freetds to connect to MSSQL database
+  - name: Add host addresses  to /etc/hosts
     blockinfile:
-       dest: /etc/freetds/freetds.conf
-       block: |
-          #Our Database Connection for MSSQL alias
-          [MSSQL]
-          	host=MSSQL
-          	port=1443
-          	tds version = 7.0
+      dest: /etc/hosts
+      block: |
+        
+        192.168.52.1	acerpc
+        192.168.52.1	MSSQL
+        192.168.52.185	udesktop
+        192.168.52.182	server1
+        192.168.52.186	server2
+   
+  - name: copy freetds.conf odbc.ini and odbcinst.ini  config file under /etc/ and etc/freetds/ directory\
+          this will be used for MSSQL database connection , testing from the server can be done using  isql -v MSSQL mssql mssql123 and \
+          tsql -S MSSQL -p 1433 -U mssql -P mssql123  
+    copy : 
+       src: "{{ item.src }}" 
+       dest: "{{ item.dest }}"
+    with_items:
+        - {src: "/home/ubuntu/ansible-dir/files/odbcinst.ini", dest: "/etc/odbcinst.ini" }
+        - {src: "/home/ubuntu/ansible-dir/files/odbc.ini",  dest: "/etc/odbc.ini" }
+        - {src: "/home/ubuntu/ansible-dir/files/freetds.conf",  dest: "/etc/freetds/freetds.conf" }
   
-  - name: copy odbcinst.ini  config file
-    copy: src=/home/ubuntu/ansible-dir/files/odbcinst.ini dest=/etc/odbcinst.ini owner=root  mode=0644
-  - name: copy odbc.ini  config file
-    copy: src=/home/ubuntu/ansible-dir/files/odbc.ini dest=/etc/odbc.ini owner=root  mode=0644
   
   - name: checkout latest web app code
     git: repo={{code_repo}}  dest={{app_dir}} accept_hostkey=True
