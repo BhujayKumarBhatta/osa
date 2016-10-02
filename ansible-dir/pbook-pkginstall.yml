@@ -1,10 +1,6 @@
 ---
-#- hosts: server1
-#  remote_user: root
-#  tasks:
-  
   - name: install apache2 
-    apt: name=apache2 state=present update_cache=yes allow_unauthenticated=yes
+    apt: name=apache2 state=present
   - name: install apache2-dev 
     apt: name=apache2-dev state=present update_cache=yes allow_unauthenticated=yes
   - name: install libapache2-mod-wsgi 
@@ -27,15 +23,29 @@
     apt: name=rabbitmq-server state=present update_cache=yes allow_unauthenticated=yes
   - name: install git package
     apt: name=git state=present update_cache=yes allow_unauthenticated=yes
+  - name: install python pip package
+    apt: name=python-pip state=present update_cache=yes allow_unauthenticated=yes
 
   - name: install pyodbc driver to connect MSSQL database  
     pip: name=pyodbc state=present 
   - name: install django azure odbc driver to connect MSSQL database
     pip: name=django-pyodbc-azure state=present 
-  - name: install django 1.10.1 or version less than 2 
-    pip: name=django state=present version=1.10.1  
+
+  - name: install python packges 
+    apt: name=libevent-dev state=present
+  - apt: name=python-dev state=present
+  - apt: name=libffi-dev state=present 
+  - apt: name=libssl-dev state=present
+  - apt: name=libxml2-dev state=present 
+  - apt: name=libxslt1-dev state=present
+  - apt: name=libjpeg8-dev state=present
+  - apt: name=zlib1g-dev state=present
+  - pip: name=mitmproxy state=present    
+     
   - name: install paramiko
     pip: name=paramiko state=present
+  - name: install django 1.10.2  
+    pip: name=django state=present version=1.10.2
   - name: install celery==3.1.23
     pip: name=celery version=3.1.23
   - name: install djangorestframework
