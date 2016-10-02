@@ -41,5 +41,9 @@ pip_packages:
 
 code_repo: https://github.com/BhujayKumarBhatta/CloudSpacewithSearchLog-Python
 app_dir: /home/ubuntu/python-projects
+django_startcommand: runserver 0.0.0.0:8000 
+djangrun_cmd: (exec python manage.py runserver 0.0.0.0:8000 &> /dev/null &)
+djangrun_cmd_1: python manage.py runserver 0.0.0.0:8000 & exit
+
   
-  
+
