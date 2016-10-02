@@ -1,5 +1,5 @@
 ---
-- hosts: server2
+- hosts: server1
   vars_files:
      - vars.yml
   remote_user: root

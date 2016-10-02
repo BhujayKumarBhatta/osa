@@ -45,7 +45,7 @@
   - name: install paramiko
     pip: name=paramiko state=present
   - name: install django 1.10.2  
-    pip: name=django state=present version=1.10.2
+    pip: name=django state=present
   - name: install celery==3.1.23
     pip: name=celery version=3.1.23
   - name: install djangorestframework
