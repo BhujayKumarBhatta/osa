@@ -5,7 +5,7 @@
   remote_user: root
   tasks:
 
-#  - include: pbook-pkginstall.yml
+  - include: pbook-pkginstall.yml
   
   - name: Add host addresses  to /etc/hosts
     blockinfile:
@@ -18,42 +18,39 @@
         192.168.52.182	server1
         192.168.52.186	server2
    
-#  - name: copy freetds.conf odbc.ini and odbcinst.ini  config file under /etc/ and etc/freetds/ directory\
-#          this will be used for MSSQL database connection , testing from the server can be done using  isql -v MSSQL mssql mssql123 and \
-#          tsql -S MSSQL -p 1433 -U mssql -P mssql123  
-#    copy : 
-#       src: "{{ item.src }}" 
-#       dest: "{{ item.dest }}"
-#    with_items:
-#        - {src: "/home/ubuntu/ansible-dir/files/odbcinst.ini", dest: "/etc/odbcinst.ini" }
-#        - {src: "/home/ubuntu/ansible-dir/files/odbc.ini",  dest: "/etc/odbc.ini" }
-#        - {src: "/home/ubuntu/ansible-dir/files/freetds.conf",  dest: "/etc/freetds/freetds.conf" }
+  - name: copy freetds.conf odbc.ini and odbcinst.ini  config file under /etc/ and etc/freetds/ directory\
+          this will be used for MSSQL database connection , testing from the server can be done using  isql -v MSSQL mssql mssql123 and \
+          tsql -S MSSQL -p 1433 -U mssql -P mssql123  
+    copy : 
+       src: "{{ item.src }}" 
+       dest: "{{ item.dest }}"
+    with_items:
+        - {src: "/home/ubuntu/ansible-dir/files/odbcinst.ini", dest: "/etc/odbcinst.ini" }
+        - {src: "/home/ubuntu/ansible-dir/files/odbc.ini",  dest: "/etc/odbc.ini" }
+        - {src: "/home/ubuntu/ansible-dir/files/freetds.conf",  dest: "/etc/freetds/freetds.conf" }
   
   
-#  - name: checkout latest  code from git hub - all the codes for my django and celery applications will be downloaded 
-#    git: repo={{code_repo}}  dest={{app_dir}} accept_hostkey=True force=no
+  - name: checkout latest  code from git hub - all the codes for my django and celery applications will be downloaded 
+    git: repo={{code_repo}}  dest={{app_dir}} accept_hostkey=True force=no
  
-#  - name: django model file need to be activated by migrating the database
-#    django_manage: command=migrate  app_path=/home/ubuntu/python-projects/djp1
+  - name: django model file need to be activated by migrating the database
+    django_manage: command=migrate  app_path=/home/ubuntu/python-projects/djp1
   
-#  - name: start celery in background mode
-#    command: celery multi start w1 -A djp1 -l info
-#    args: 
-#      chdir: /home/ubuntu/python-projects/djp1/
+  - name: start celery in background mode
+    command: celery multi start w1 -A djp1 -l info
+    args: 
+      chdir: /home/ubuntu/python-projects/djp1/
 
 #  - name: start django
 #    shell: daemon /home/ubuntu/python-projects/djp1/python manage.py runserver 0.0.0.0:8000 &
 
-  - name: Start Django runserver  application  using script   
-    shell:  ./start_django_server.sh
-    args:
-      chdir: "/home/ubuntu/python-projects/djp1"
+#  - name: Start Django runserver  application  using script   
+#    shell:  ./start_django_server.sh
+#    args:
+#      chdir: "/home/ubuntu/python-projects/djp1"
 
-#    django_manage: command='runserver 0.0.0.0:8000' app_path=/home/ubuntu/python-projects/djp1
-    
-#  - name: start from shell
-#    shell: {{ project_root }}/env/bin/python {{ project_root }}/code/webapp/manage.py syncdb --migrate --noinput
-  - name: Apache2 conf
+
+  - name: Apache2 wsgi configuration 
     blockinfile:
       dest: /etc/apache2/apache2.conf
       block: |

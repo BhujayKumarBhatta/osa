@@ -2,20 +2,7 @@
 #- hosts: server1
 #  remote_user: root
 #  tasks:
-  - name: install pyodbc driver to connect MSSQL database  
-    pip: name=pyodbc state=latest 
-  - name: install django azure odbc driver to connect MSSQL database
-    pip: name=django-pyodbc-azure state=latest 
-  - name: install django 1.10.1 or version less than 2 
-    pip: name=django state=present version=1.10.1  
-  - name: install paramiko
-    pip: name=paramiko state=present
-  - name: install celery==3.1.23
-    pip: name=celery version=3.1.23
-  - name: install djangorestframework
-    pip: name=djangorestframework state=present
-  - name: install django-celery
-    pip: name=django-celery  state=present
+  
   - name: install apache2 
     apt: name=apache2 state=present update_cache=yes allow_unauthenticated=yes
   - name: install apache2-dev 
@@ -40,4 +27,19 @@
     apt: name=rabbitmq-server state=present update_cache=yes allow_unauthenticated=yes
   - name: install git package
     apt: name=git state=present update_cache=yes allow_unauthenticated=yes
+
+  - name: install pyodbc driver to connect MSSQL database  
+    pip: name=pyodbc state=present 
+  - name: install django azure odbc driver to connect MSSQL database
+    pip: name=django-pyodbc-azure state=present 
+  - name: install django 1.10.1 or version less than 2 
+    pip: name=django state=present version=1.10.1  
+  - name: install paramiko
+    pip: name=paramiko state=present
+  - name: install celery==3.1.23
+    pip: name=celery version=3.1.23
+  - name: install djangorestframework
+    pip: name=djangorestframework state=present
+  - name: install django-celery
+    pip: name=django-celery  state=present
   
