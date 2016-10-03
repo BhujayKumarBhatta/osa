@@ -1,37 +1,31 @@
 ---
-  - name: install apache2 
-    apt: name=apache2 state=present
-  - name: install apache2-dev 
-    apt: name=apache2-dev state=present update_cache=yes allow_unauthenticated=yes
-  - name: install libapache2-mod-wsgi 
-    apt: name=libapache2-mod-wsgi state=present update_cache=yes allow_unauthenticated=yes
+  - name: install apache2 install_recommends=yes state=latest update_cache=yes
+    apt: name=apache2 install_recommends=yes state=latest
+  - name: install install_recommends=yes state=latest
+    apt: name=apache2-dev install_recommends=yes state=latest  allow_unauthenticated=yes
+  - name: install libapache2-mod-wsgi
+    apt: name=libapache2-mod-wsgi install_recommends=yes state=latest  allow_unauthenticated=yes
   - name: install g++ 
-    apt: name=g++ state=present update_cache=yes allow_unauthenticated=yes
+    apt: name=g++ state=present  allow_unauthenticated=yes
   - name: install unix odbc driver to connect MSSQL database
-    apt: name=unixodbc state=present update_cache=yes allow_unauthenticated=yes
+    apt: name=unixodbc state=present  allow_unauthenticated=yes
   - name: install unix odbcdev  driver to connect MSSQL database
-    apt: name=unixodbc-dev state=present update_cache=yes allow_unauthenticated=yes
+    apt: name=unixodbc-dev state=present  allow_unauthenticated=yes
   - name: install unix odbcdev  driver to connect MSSQL database
-    apt: name=unixodbc-dev state=present update_cache=yes allow_unauthenticated=yes
+    apt: name=unixodbc-dev state=present  allow_unauthenticated=yes
   - name: install freetdsdev  driver to connect MSSQL database
-    apt: name=freetds-dev state=present update_cache=yes allow_unauthenticated=yes
+    apt: name=freetds-dev state=present  allow_unauthenticated=yes
   - name: install freetds-bin  driver to connect MSSQL database
-    apt: name=freetds-bin state=present update_cache=yes allow_unauthenticated=yes
+    apt: name=freetds-bin state=present  allow_unauthenticated=yes
   - name: install tdsodbc  driver to connect MSSQL database
-    apt: name=tdsodbc state=present update_cache=yes allow_unauthenticated=yes
+    apt: name=tdsodbc state=present  allow_unauthenticated=yes
   - name: install rabbitmq 
-    apt: name=rabbitmq-server state=present update_cache=yes allow_unauthenticated=yes
+    apt: name=rabbitmq-server state=present  allow_unauthenticated=yes
   - name: install git package
-    apt: name=git state=present update_cache=yes allow_unauthenticated=yes
+    apt: name=git state=present  allow_unauthenticated=yes
   - name: install python pip package
-    apt: name=python-pip state=present update_cache=yes allow_unauthenticated=yes
-
-  - name: install pyodbc driver to connect MSSQL database  
-    pip: name=pyodbc state=present 
-  - name: install django azure odbc driver to connect MSSQL database
-    pip: name=django-pyodbc-azure state=present 
-
-  - name: install python packges 
+    apt: name=python-pip state=present  allow_unauthenticated=yes
+  - name: libevent, python dev , libffi etc. without without paramiko installation fails  
     apt: name=libevent-dev state=present
   - apt: name=python-dev state=present
   - apt: name=libffi-dev state=present 
@@ -40,7 +34,16 @@
   - apt: name=libxslt1-dev state=present
   - apt: name=libjpeg8-dev state=present
   - apt: name=zlib1g-dev state=present
-  - pip: name=mitmproxy state=present    
+
+  - name: install pyodbc driver to connect MSSQL database  
+    pip: name=pyodbc state=present 
+  - name: install django azure odbc driver to connect MSSQL database
+    pip: name=django-pyodbc-azure state=present 
+
+  - name: install python packges - mitmproxy , without this paramiko installation fails 
+#   pip: name=mitmproxy state=present  ;with ubuntu 16 it was
+    pip: name=mitmproxy state=present 
+        
      
   - name: install paramiko
     pip: name=paramiko state=present

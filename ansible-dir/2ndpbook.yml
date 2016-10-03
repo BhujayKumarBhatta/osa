@@ -1,8 +1,12 @@
 ---
-- hosts: server1
+- hosts: dcim
   vars_files:
      - vars.yml
-  remote_user: root
+#  remote_user: ubuntu
+  become: true
+#  become_user: root
+#  become_method: sudo
+  
   tasks:
 
   - name: copy the apt-get source configuration to /etc/apt/sources.list
@@ -22,6 +26,7 @@
         192.168.52.185	udesktop
         192.168.52.182	server1
         192.168.52.186	server2
+        14.142.104.139  MSSQL1
    
   - name: copy freetds.conf odbc.ini and odbcinst.ini  config file under /etc/ and etc/freetds/ directory\
           this will be used for MSSQL database connection , testing from the server can be done using  isql -v MSSQL mssql mssql123 and \
@@ -38,9 +43,38 @@
   - name: checkout latest  code from git hub - all the codes for my django and celery applications will be downloaded 
     git: repo={{code_repo}}  dest={{app_dir}} accept_hostkey=True force=no
  
-  - name: django model file need to be activated by migrating the database
-    django_manage: command=migrate  app_path=/home/ubuntu/python-projects/djp1
-  
+  - name: django model file need to be activated by makemigrations
+    django_manage: command="makemigrations app1" app_path=/home/ubuntu/python-projects/djp1 settings=djp1.settings
+  - name: use migration command to actually create the database tables  
+    django_manage: command=migrate  app_path=/home/ubuntu/python-projects/djp1 settings=djp1.settings
+
+  - name: restart rabbitmq-server
+    service: name=rabbitmq-server state=started enabled=yes
+
+  - name: enable rabbitmq plugins
+    rabbitmq_plugin: names=rabbitmq_management,rabbitmq_tracing,rabbitmq_federation state=enabled
+    notify:
+    - restart rabbitmq
+
+  - name: add users
+    rabbitmq_user: user={{item}} password=changeme tags=administrator,{{item}} vhost=/ configure_priv=.* write_priv=.* read_priv=.* state=present
+    with_items:
+    - onepk
+    - ubuntu
+
+#  - name: remove default guest user
+#    rabbitmq_user: user=guest state=absent
+
+  - name: ensure vhost /test is present
+    rabbitmq_vhost: name=/myvhost state=present
+
+#  - name: set federation local-username
+#    rabbitmq_parameter: component=federation name=local-username value='"user1"' state=present
+
+  handlers:
+  - name: restart rabbitmq
+    service: name=rabbitmq-server state=restarted
+
   - name: start celery in background mode
     command: celery multi start w1 -A djp1 -l info
     args: 
