@@ -45,5 +45,17 @@ django_startcommand: runserver 0.0.0.0:8000
 djangrun_cmd: (exec python manage.py runserver 0.0.0.0:8000 &> /dev/null &)
 djangrun_cmd_1: python manage.py runserver 0.0.0.0:8000 & exit
 
+host_table_entry: |
+        192.168.52.1	acerpc
+        192.168.52.1	MSSQL
+        192.168.52.185	udesktop
+        192.168.52.182	server1
+        192.168.52.186	server2
+        14.142.104.139	MSSQL1
+        14.142.104.138	dcim
+        14.142.104.142	dcim2
+        10.0.0.45	swiftnode1
+        10.0.0.46       swiftnode2
+
   
 

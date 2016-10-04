@@ -14,19 +14,12 @@
        src: /etc/apt/sources.list 
        dest: /etc/apt/sources.list
 
-  - include: pbook-pkginstall.yml
+#  - include: pbook-pkginstall.yml
   
   - name: Add host addresses  to /etc/hosts
     blockinfile:
       dest: /etc/hosts
-      block: |
-        
-        192.168.52.1	acerpc
-        192.168.52.1	MSSQL
-        192.168.52.185	udesktop
-        192.168.52.182	server1
-        192.168.52.186	server2
-        14.142.104.139  MSSQL1
+      block: "{{ host_table_entry }}"        
    
   - name: copy freetds.conf odbc.ini and odbcinst.ini  config file under /etc/ and etc/freetds/ directory\
           this will be used for MSSQL database connection , testing from the server can be done using  isql -v MSSQL mssql mssql123 and \
@@ -43,8 +36,12 @@
   - name: checkout latest  code from git hub - all the codes for my django and celery applications will be downloaded 
     git: repo={{code_repo}}  dest={{app_dir}} accept_hostkey=True force=no
  
+#  - name: django model file need to be activated by makemigrations
+#    django_manage: command="makemigrations --noinput app1" app_path=/home/ubuntu/python-projects/djp1 settings=djp1.settings
+#  - name: use migration command to actually create the database tables  
+#    django_manage: command="migrate  --noinput -fake app1" app_path=/home/ubuntu/python-projects/djp1 settings=djp1.settings apps=app1
   - name: django model file need to be activated by makemigrations
-    django_manage: command="makemigrations app1" app_path=/home/ubuntu/python-projects/djp1 settings=djp1.settings
+    django_manage: command="makemigrations --noinput " app_path=/home/ubuntu/python-projects/djp1 settings=djp1.settings
   - name: use migration command to actually create the database tables  
     django_manage: command=migrate  app_path=/home/ubuntu/python-projects/djp1 settings=djp1.settings
 
@@ -71,11 +68,13 @@
 #  - name: set federation local-username
 #    rabbitmq_parameter: component=federation name=local-username value='"user1"' state=present
 
-  handlers:
-  - name: restart rabbitmq
-    service: name=rabbitmq-server state=restarted
+   
+  - name: Stop celery background tasks worker pool w1
+    command: celery multi stop w1 -A djp1 -l info
+    args: 
+      chdir: /home/ubuntu/python-projects/djp1/
 
-  - name: start celery in background mode
+  - name: start celery in background mode - worker pool w1
     command: celery multi start w1 -A djp1 -l info
     args: 
       chdir: /home/ubuntu/python-projects/djp1/
@@ -112,4 +111,8 @@
         Require all granted
         </Directory>
   - name: restart Apache 2 service
-    service: name=apache2 state=restarted    
+    service: name=apache2 state=stopped
+  - service: name=apache2 state=started
+  handlers:
+  - name: restart rabbitmq
+    service: name=rabbitmq-server state=restarted   

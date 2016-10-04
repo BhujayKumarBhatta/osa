@@ -51,8 +51,10 @@
     pip: name=django state=present
   - name: install celery==3.1.23
     pip: name=celery version=3.1.23
+  - name: install celery monitoring tool flower
+    pip: name=flower  state=present  
   - name: install djangorestframework
     pip: name=djangorestframework state=present
   - name: install django-celery
-    pip: name=django-celery  state=present
+    pip: name=django-celery  state=present  
   
