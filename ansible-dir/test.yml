@@ -1,0 +1,60 @@
+---
+- hosts: dcim2
+  vars_files:
+     - vars/testvar.yml
+#     - testvar.yml
+#     - [ "vars/{{ ansible_os_family }}.yml", "vars/os_defaults.yml" ]
+# For some hosts login to root from a terminal is allowed , in that case we could run it as remote_user=root.
+# When root is not allowed , login as ordinary user and escalate to privilaged by using become:true . In the remote server switching to sudo should not ask a password by configuring /etc/sudoers appropriately.
+
+#  remote_user: root
+  become: true
+#  become_user: root
+#  become_method: sudo
+  
+  tasks:
+
+
+#Some installation from images points to local cdrom form apt package inatallation. To change it to internet source based on uvbuntu version we are changing the source configuration. After this installation will start based on list of packges in  pbbok-pkginstall-3.yml file 
+  - name: For ubuntu 16 Xenial copy the apt-get source ansible-dir/files/sources.list.xenial configuration to /etc/apt/sources.list
+    copy : 
+       src: "{{item.vsrc}}"
+       dest: "{{item.vdest}}"
+#   command: echo {{item.osdist}}
+    when: 
+      - ansible_distribution == {{item.osdist}}
+      - ansible_distribution_major_version == {{item.osdistmaj}}
+      - ansible_distribution_release == {{item.osdistrel}} 
+#      - ansible_distribution == "Ubuntu"
+#      - ansible_distribution_major_version == '14'
+#      - ansible_distribution_major_version == {{item.osdistmaj}}
+#      - ansible_distribution_version == "14.04"
+#      - ansible_distribution_release == "trusty"    
+    with_items: "{{ apt_source_list_basedon_ostype }}" 
+#####################Apache Configuration and starting the service , this overwirites any existing configuration ans is suitable for  a dedicated apache for our app ##############################################
+
+#  - name: Check Apache2.conf file exists
+#    stat: path= "{{ item.fpath }}"    
+#    register: result
+#    with_items: "{{ apache_config_files }}"
+#  - name: Stop  Apache 2 service before replacing the apache2.conf file 
+#    service: name=apache2 state=stopped
+#  - name: echo ietm index 
+#    command: echo "{{item.x}}"  
+#    with_items: "{{ apache_config_files }}"
+#  - command: echo result.results[0]
+#  - name: keep a backup of the existing apache2.conf file
+#    command: mv "{{ item.fpath }}" "{{ item.rnm }}"
+#    when: result.results[{{item.x}}].stat.exists  
+#    with_items: "{{ apache_config_files }}"
+#  - name: copy apache2.conf for Apache2 wsgi configuration and ports.conf for port 80
+#    copy : 
+#       src: "{{ item.fsrc }}"
+#       dest: "{{ item.fdest }}"
+#    with_items: "{{ apache_config_files }}"
+#  - name: Start Apache 2 service 
+#    service: name=apache2 state=started
+
+#  handlers:
+#  - name: restart rabbitmq
+#    service: name=rabbitmq-server state=restarted   

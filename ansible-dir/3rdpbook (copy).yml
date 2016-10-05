@@ -31,7 +31,7 @@
          - ansible_distribution_version == "14.04"
          - ansible_distribution_release == "trusty"
 
-#  - include: pbook-pkginstall-3.yml
+  - include: pbook-pkginstall-3.yml
 
 # Include IP address and host names in the hosts file . This are taken from the varibale file var3.yml   
   - name: Add host addresses  to /etc/hosts
@@ -99,20 +99,17 @@
 #####################Apache Configuration and starting the service , this overwirites any existing configuration ans is suitable for  a dedicated apache for our app ##############################################
 
   - name: Check Apache2.conf file exists
-    stat: path= "{{ item.fpath }}"    
-    register: result
-    with_items: "{{ apache_config_files }}"
+    stat: path=/etc/apache/apache2.conf
+    register: apache2dotconf_stat
   - name: Stop  Apache 2 service before replacing the apache2.conf file 
     service: name=apache2 state=stopped
   - name: keep a backup of the existing apache2.conf file
-    command: mv "{{ item.fpath }}" "{{ item.rnm }}"
-#    when: result.results[{{item.x}}].stat.exists
-    with_items: "{{ apache_config_files }}"
-  - name: copy apache2.conf for Apache2 wsgi configuration and ports.conf for port 80
+    command: mv /etc/apache2/apache2.conf  /etc/apache/apache2.conf.ansible-backup
+    when: apache2dotconf_stat.stat.exists
+  - name: copy apache2.conf for Apache2 wsgi configuration
     copy : 
-       src: "{{ item.fsrc }}"
-       dest: "{{ item.fdest }}"
-    with_items: "{{ apache_config_files }}"
+       src: files/apache2.conf.wsgi-ansible
+       dest: /etc/apache2/apache2.conf
   - name: Start Apache 2 service 
     service: name=apache2 state=started
 

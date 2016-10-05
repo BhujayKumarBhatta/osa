@@ -1,8 +1,10 @@
 ---
   - name: install apache2 install_recommends=yes state=latest update_cache=yes
     apt: name=apache2 install_recommends=yes state=latest
+
   - name: install install_recommends=yes state=latest
     apt: name=apache2-dev install_recommends=yes state=latest  allow_unauthenticated=yes
+    ignore_errors: True 
   - name: install libapache2-mod-wsgi
     apt: name=libapache2-mod-wsgi install_recommends=yes state=latest  allow_unauthenticated=yes
   - name: install g++ 
@@ -19,8 +21,10 @@
     apt: name=freetds-bin state=present  allow_unauthenticated=yes
   - name: install tdsodbc  driver to connect MSSQL database
     apt: name=tdsodbc state=present  allow_unauthenticated=yes
+#  - name: Include apt reposirity for rabbitmq-server to sources.list.d
+#    shell: echo 'deb http://www.rabbitmq.com/debian/ stable main' | tee /etc/apt/sources.list.d/rabbitmq.list
   - name: install rabbitmq 
-    apt: name=rabbitmq-server state=present  allow_unauthenticated=yes
+    apt: name=rabbitmq-server state=present update_cache=yes  allow_unauthenticated=yes
   - name: install git package
     apt: name=git state=present  allow_unauthenticated=yes
   - name: install python pip package
