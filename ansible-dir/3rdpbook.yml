@@ -14,24 +14,15 @@
 #Some installation from images points to local cdrom form apt package inatallation. To change it to internet source based on uvbuntu version we are changing the source configuration. After this installation will start based on list of packges in  pbbok-pkginstall-3.yml file 
   - name: For ubuntu 16 Xenial copy the apt-get source ansible-dir/files/sources.list.xenial configuration to /etc/apt/sources.list
     copy : 
-       src: files/sources.list.xenial 
-       dest: /etc/apt/sources.list.testXenial
-    when:
-         - ansible_distribution =="ubuntu"
-         - ansible_distribution_major_version == "16"
-         - absible_distribution_release == "xenial"
-
-  - name: Forubuntu 14 trusty - copy the apt-get source ansible-dir/files/sources.list.trusty configuration to /etc/apt/sources.list
-    copy : 
-       src: files/sources.list.trusty 
-       dest: /etc/apt/sources.list.testtrusty
-    when:
-         - ansible_distribution == "Ubuntu"
-         - ansible_distribution_major_version == "14"
-         - ansible_distribution_version == "14.04"
-         - ansible_distribution_release == "trusty"
-
-#  - include: pbook-pkginstall-3.yml
+       src: "{{item.vsrc}}"
+       dest: "{{item.vdest}}"
+#   command: echo {{item.osdist}}
+    when: 
+      - ansible_distribution == {{item.osdist}}
+      - ansible_distribution_major_version == {{item.osdistmaj}}
+      - ansible_distribution_release == {{item.osdistrel}}   
+    with_items: "{{ apt_source_list_basedon_ostype }}" 
+  - include: pbook-pkginstall-3.yml
 
 # Include IP address and host names in the hosts file . This are taken from the varibale file var3.yml   
   - name: Add host addresses  to /etc/hosts
@@ -98,15 +89,22 @@
 
 #####################Apache Configuration and starting the service , this overwirites any existing configuration ans is suitable for  a dedicated apache for our app ##############################################
 
+#never give a space after  the equal to sign. For example path=<filename> is ok however  path= <filename> wont work.
   - name: Check Apache2.conf file exists
-    stat: path= "{{ item.fpath }}"    
+    stat: path="{{item.fpath}}"    
     register: result
     with_items: "{{ apache_config_files }}"
   - name: Stop  Apache 2 service before replacing the apache2.conf file 
     service: name=apache2 state=stopped
+#  - name: echo ietm index 
+#    command: echo "{{item.x}}"  
+#    with_items: "{{ apache_config_files }}"
+#    when: "{{item.x}}>0"
+#  - name: Show the result registertered in previous step
+#    command: echo "result.results[{{item.x}}].stat.ctime"
   - name: keep a backup of the existing apache2.conf file
     command: mv "{{ item.fpath }}" "{{ item.rnm }}"
-#    when: result.results[{{item.x}}].stat.exists
+    when: "result.results[{{item.x}}].stat.exists"  
     with_items: "{{ apache_config_files }}"
   - name: copy apache2.conf for Apache2 wsgi configuration and ports.conf for port 80
     copy : 
@@ -115,6 +113,7 @@
     with_items: "{{ apache_config_files }}"
   - name: Start Apache 2 service 
     service: name=apache2 state=started
+
 
   handlers:
   - name: restart rabbitmq

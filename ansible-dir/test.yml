@@ -16,45 +16,49 @@
 
 
 #Some installation from images points to local cdrom form apt package inatallation. To change it to internet source based on uvbuntu version we are changing the source configuration. After this installation will start based on list of packges in  pbbok-pkginstall-3.yml file 
-  - name: For ubuntu 16 Xenial copy the apt-get source ansible-dir/files/sources.list.xenial configuration to /etc/apt/sources.list
-    copy : 
-       src: "{{item.vsrc}}"
-       dest: "{{item.vdest}}"
+#  - name: For ubuntu 16 Xenial copy the apt-get source ansible-dir/files/sources.list.xenial configuration to /etc/apt/sources.list
+#    copy : 
+#       src: "{{item.vsrc}}"
+#       dest: "{{item.vdest}}"
 #   command: echo {{item.osdist}}
-    when: 
-      - ansible_distribution == {{item.osdist}}
-      - ansible_distribution_major_version == {{item.osdistmaj}}
-      - ansible_distribution_release == {{item.osdistrel}} 
+#    when: 
+#      - ansible_distribution == {{item.osdist}}
+#      - ansible_distribution_major_version == {{item.osdistmaj}}
+#      - ansible_distribution_release == {{item.osdistrel}} 
 #      - ansible_distribution == "Ubuntu"
 #      - ansible_distribution_major_version == '14'
 #      - ansible_distribution_major_version == {{item.osdistmaj}}
 #      - ansible_distribution_version == "14.04"
 #      - ansible_distribution_release == "trusty"    
-    with_items: "{{ apt_source_list_basedon_ostype }}" 
+#    with_items: "{{ apt_source_list_basedon_ostype }}" 
 #####################Apache Configuration and starting the service , this overwirites any existing configuration ans is suitable for  a dedicated apache for our app ##############################################
-
 #  - name: Check Apache2.conf file exists
-#    stat: path= "{{ item.fpath }}"    
-#    register: result
-#    with_items: "{{ apache_config_files }}"
-#  - name: Stop  Apache 2 service before replacing the apache2.conf file 
-#    service: name=apache2 state=stopped
+#    stat: path=/etc/apache2/apache2.conf    
+#    register: myresult
+#  - name: show myresult
+#    command: echo myresult.stat.ctime
+#never give a space after  the equal to sign . path=<filename> is ok. path= <filename> wont work.
+  - name: Check Apache2.conf file exists
+    stat: path="{{item.fpath}}"    
+    register: result
+    with_items: "{{ apache_config_files }}"
+  - name: Stop  Apache 2 service before replacing the apache2.conf file 
+    service: name=apache2 state=stopped
 #  - name: echo ietm index 
 #    command: echo "{{item.x}}"  
 #    with_items: "{{ apache_config_files }}"
-#  - command: echo result.results[0]
-#  - name: keep a backup of the existing apache2.conf file
-#    command: mv "{{ item.fpath }}" "{{ item.rnm }}"
-#    when: result.results[{{item.x}}].stat.exists  
-#    with_items: "{{ apache_config_files }}"
-#  - name: copy apache2.conf for Apache2 wsgi configuration and ports.conf for port 80
-#    copy : 
-#       src: "{{ item.fsrc }}"
-#       dest: "{{ item.fdest }}"
-#    with_items: "{{ apache_config_files }}"
-#  - name: Start Apache 2 service 
-#    service: name=apache2 state=started
+#    when: "{{item.x}}>0"
+#  - name: Show the result registertered in previous step
+#    command: echo "result.results[{{item.x}}].stat.ctime"
+  - name: keep a backup of the existing apache2.conf file
+    command: mv "{{ item.fpath }}" "{{ item.rnm }}"
+    when: "result.results[{{item.x}}].stat.exists"  
+    with_items: "{{ apache_config_files }}"
+  - name: copy apache2.conf for Apache2 wsgi configuration and ports.conf for port 80
+    copy : 
+       src: "{{ item.fsrc }}"
+       dest: "{{ item.fdest }}"
+    with_items: "{{ apache_config_files }}"
+  - name: Start Apache 2 service 
+    service: name=apache2 state=started
 
-#  handlers:
-#  - name: restart rabbitmq
-#    service: name=rabbitmq-server state=restarted   
