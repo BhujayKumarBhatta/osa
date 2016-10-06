@@ -1,6 +1,6 @@
 ---
 - hosts: dcim2
-  vars_files:
+- vars_files:
      - vars/testvar.yml
 #     - testvar.yml
 #     - [ "vars/{{ ansible_os_family }}.yml", "vars/os_defaults.yml" ]
@@ -41,9 +41,7 @@
   - name: Check Apache2.conf file exists
     stat: path="{{item.fpath}}"    
     register: result
-    with_items: "{{ apache_config_files }}"
-  - name: Stop  Apache 2 service before replacing the apache2.conf file 
-    service: name=apache2 state=stopped
+    with_items: "{{ apache_config_files }}"  
 #  - name: echo ietm index 
 #    command: echo "{{item.x}}"  
 #    with_items: "{{ apache_config_files }}"
@@ -59,6 +57,15 @@
        src: "{{ item.fsrc }}"
        dest: "{{ item.fdest }}"
     with_items: "{{ apache_config_files }}"
-  - name: Start Apache 2 service 
-    service: name=apache2 state=started
+    notify:
+       - service: name=apache state=stopped
+       - service: name=apache state=started
+
+#  handlers:
+#   - name: Stop Apache
+#     service: name=apache state=stopped
+#     listen: "apache stop and restart  handlers"
+#  - name: Stope Apache
+#    service: name=apache state=stopped
+#    listen: "apache stop and restart  handlers"
 

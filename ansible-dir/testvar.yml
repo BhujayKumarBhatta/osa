@@ -59,9 +59,9 @@ host_table_entry: |
         10.0.0.45	swiftnode1
         10.0.0.46       swiftnode2
 apache_config_files:
- - {name: apache2.conf, rnm: /etc/apache2/apache2.conf-ansible,fpath: /etc1/apache2/apache2.conf, idn: A,x: 0, fsrc: files/apache2.conf.wsgi-ansible, fdest: /etc/apache2/apache2.conf}
+ - {name: apache2.conf, rnm: /etc/apache2/apache2.conf-ansible,fpath: /etc/apache2/apache2.conf, idn: A,x: 0, fsrc: files/apache2.conf.wsgi-ansible, fdest: /etc/apache2/apache2.conf}
  - {name: ports.conf, rnm: /etc/apache2/ports.conf-ansible,fpath: /etc/apache2/ports.conf, idn: B , x: 1,fsrc: files/ports.conf.ansible-file, fdest: /etc/apache2/ports.conf}  
-apt_source_list_basedon_ostype:
- - {vsrc: files/sources.list.xenial, vdest: /etc/apt/sources.list.testXenial, osdist: "ansible_distribution == 'ubuntu'", osdistmaj:"ansible_distribution_major_version == '16'", osdistrel: "absible_distribution_release == 'xenial'" }
- - {vsrc: files/sources.list.trusty , vdest: /etc/apt/sources.list.testtrusty, osdist: "ansible_distribution == 'ubuntu'", osdistmaj:"ansible_distribution_major_version == '14'", osdistrel: "absible_distribution_release == 'trusty'" } 
+#apt_source_list_basedon_ostype:
+# - {vsrc: files/sources.list.xenial, vdest: /etc/apt/sources.list.testXenial, osdist: "ansible_distribution == 'ubuntu'", #osdistmaj:"ansible_distribution_major_version == '16'", osdistrel: "absible_distribution_release == 'xenial'" }
+# - {vsrc: files/sources.list.trusty , vdest: /etc/apt/sources.list.testtrusty, osdist: "ansible_distribution == 'ubuntu'", #osdistmaj:"ansible_distribution_major_version == '14'", osdistrel: "absible_distribution_release == 'trusty'" } 
 

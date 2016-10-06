@@ -1,5 +1,5 @@
 ---
-- hosts: dcim2
+- hosts: "{{myhosts}}"
   vars_files:
      - vars-3.yml
 # For some hosts login to root from a terminal is allowed , in that case we could run it as remote_user=root.
@@ -94,27 +94,28 @@
     stat: path="{{item.fpath}}"    
     register: result
     with_items: "{{ apache_config_files }}"
-  - name: Stop  Apache 2 service before replacing the apache2.conf file 
-    service: name=apache2 state=stopped
-#  - name: echo ietm index 
-#    command: echo "{{item.x}}"  
-#    with_items: "{{ apache_config_files }}"
-#    when: "{{item.x}}>0"
-#  - name: Show the result registertered in previous step
-#    command: echo "result.results[{{item.x}}].stat.ctime"
+
   - name: keep a backup of the existing apache2.conf file
-    command: mv "{{ item.fpath }}" "{{ item.rnm }}"
+    copy:
+      src: "{{ item.fpath }}"
+      dest: "{{ item.rnm }}"
     when: "result.results[{{item.x}}].stat.exists"  
     with_items: "{{ apache_config_files }}"
+
   - name: copy apache2.conf for Apache2 wsgi configuration and ports.conf for port 80
     copy : 
        src: "{{ item.fsrc }}"
        dest: "{{ item.fdest }}"
     with_items: "{{ apache_config_files }}"
-  - name: Start Apache 2 service 
-    service: name=apache2 state=started
+    notify:
+      - stop apache 
+      - start apace
 
 
   handlers:
-  - name: restart rabbitmq
-    service: name=rabbitmq-server state=restarted   
+   - name: restart rabbitmq
+     service: name=rabbitmq-server state=restarted
+   - name: stop apache 
+     service: name=apache2 state=stopped
+   - name: start apace
+     service: name=apache2 state=started      
