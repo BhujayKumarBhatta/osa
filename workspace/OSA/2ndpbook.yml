@@ -1,0 +1,46 @@
+---
+- hosts: server1
+  vars_files:
+     - vars.yml
+  remote_user: root
+  tasks:
+  
+  - name: Configure freetds to connect to MSSQL database
+    blockinfile:
+       dest: /etc/freetds/freetds.conf
+       block: |
+          #Our Database Connection for MSSQL alias
+          [MSSQL]
+          	host=MSSQL
+          	port=1443
+          	tds version = 7.0
+  - name: Configure odbcinst by creting a new file /etc/odbcinst.ini 
+    lineinfile: 
+       dest: /etc/odbcinst.ini
+       line: "{{ item.line }}"
+       state: present
+       create: True
+    with_items:
+        - { line: "#Our Database Connection for MSSQL alias " }
+        - { line: "[MSSQL]" }
+        - { line: "[FreeTDS]" }
+        - { line: "Description = v0.91 with protocol v7.2" }
+        - { line: "Driver = /usr/lib/x86_64-linux-gnu/odbc/libtdsodbc.so" }
+        - { line: "Setup=/usr/lib/i386-linux-gnu/odbc/libtdsS.so" }
+        - { line: "FileUsage = 1" }
+        - { line: "UsageCount = 1" }
+  - name: Configure odbc by creting a new file /etc/odbc.ini 
+    lineinfile: 
+       dest: /etc/odbc.ini
+       line: "{{ item.line }}"
+       state: present
+       create: True
+    with_items:
+        - { line: "#Our Database Connection for MSSQL alias " }
+        - { line: "[MSSQL]" }
+        - { line: "Driver = FreeTDS " }
+        - { line: "ServerName = MSSQL" }
+        - { line: "Port = 1433" }
+        - { line: "TDS_Version = 7.2" }
+  - name: checkout latest web app code
+    git: repo={{code_repo}}  dest={{app_dir}} accept_hostkey=True

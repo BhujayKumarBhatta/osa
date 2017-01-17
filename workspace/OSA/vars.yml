@@ -1,0 +1,45 @@
+---
+apt_packages:
+#   - python-dev
+#   - libffi-dev
+#   - libssl-dev
+#   - libxml2-dev
+#   - libxslt1-dev
+#   - libjpeg8-dev
+#   - zlib1g-dev
+#   - libevent-dev
+#   - libffi-dev
+    - apache2
+#   - apache2-dev
+#   - libapache2-mod-wsgi
+#   - g++
+#   - unixodbc
+#   - unixodbc-dev  
+#   - freetds-dev
+#   - freetds-bin
+#   - tdsodbc   
+#   - python-virtualenv
+#   - curl    
+
+apt_packages_1:
+    - rabbitmq-server  
+
+  
+pip_packages:
+#  - mitmproxy
+   - paramiko
+#  - pyodbc 
+#  - django-pyodbc-azure
+#  - django=1.10.1
+   - celery==3.2.13
+   - flower
+   - django-celery
+   - djangorestframework
+#  - django-filter
+#  - markdown
+
+
+code_repo: https://github.com/BhujayKumarBhatta/CloudSpacewithSearchLog-Python
+app_dir: /home/ubuntu/python-projects
+  
+  
