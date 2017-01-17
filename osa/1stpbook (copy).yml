@@ -1,0 +1,82 @@
+---
+- hosts: server1
+  remote_user: root
+  tasks:
+  - name: install apache2 
+    apt: name=apache2 state=present update_cache=yes allow_unauthenticated=yes
+  - name: install apache2-dev 
+    apt: name=apache2-dev state=present update_cache=yes allow_unauthenticated=yes
+  - name: install libapache2-mod-wsgi 
+    apt: name=libapache2-mod-wsgi state=present update_cache=yes allow_unauthenticated=yes
+  - name: install g++ 
+    apt: name=g++ state=present update_cache=yes allow_unauthenticated=yes
+  - name: install unix odbc driver to connect MSSQL database
+    apt: name=unixodbc state=present update_cache=yes allow_unauthenticated=yes
+  - name: install unix odbcdev  driver to connect MSSQL database
+    apt: name=unixodbc-dev state=present update_cache=yes allow_unauthenticated=yes
+  - name: install unix odbcdev  driver to connect MSSQL database
+    apt: name=unixodbc-dev state=present update_cache=yes allow_unauthenticated=yes
+  - name: install freetdsdev  driver to connect MSSQL database
+    apt: name=freetds-dev state=present update_cache=yes allow_unauthenticated=yes
+  - name: install freetds-bin  driver to connect MSSQL database
+    apt: name=freetds-bin state=present update_cache=yes allow_unauthenticated=yes
+  - name: install tdsodbc  driver to connect MSSQL database
+    apt: name=tdsodbc state=present update_cache=yes allow_unauthenticated=yes
+  - name: install pyodbc driver to connect MSSQL database
+    pip: name=pyodbc state=latest 
+  - name: install odbc driver to connect MSSQL database
+    pip: name=django-pyodbc-azure state=latest 
+  - name: install django 1.10.1 or version less than 2 
+    pip: name=django state=present version=1.10.1
+  - name: Add mappings to /etc/hosts
+    blockinfile:
+      dest: /etc/hosts
+      block: |
+        {{item.ip}} {{item.name}}
+      marker: "# {mark} ANSIBLE MANAGED BLOCK {{item.name}}"
+     # backup:yes
+    with_items:
+        - { name: acerpc, ip: 192.168.52.1 }
+        - { name: MSSQL, ip: 192.168.52.1 }
+        - { name: udesktop, ip: 192.168.52.185}
+        - { name: server1, ip: 192.168.52.182}
+        - { name: server2, ip: 192.168.52.186}
+  - name: Configure freetds to connect to MSSQL database
+    lineinfile:
+       dest: /etc/freetds/freetds.conf
+       line: "{{ item.line }}"
+       insertafter: "{{ item.insertafter }}"
+    with_items:
+        - { line: "#Our Database Connection for MSSQL alias ", insertafter: EOF }
+        - { line: "[MSSQL]", insertafter: "^#Our Database Connection for MSSQL alias " }
+        - { line: "	host=MSSQL", insertafter: "^[MSSQL]" }
+        - { line: "	port=1443", insertafter: "^host=MSSQL" }
+        - { line: "	tds version = 7.0", insertafter: "^port=1443" }
+  - name: Configure odbcinst by creting a new file /etc/odbcinst.ini 
+    lineinfile: 
+       dest: /etc/odbcinst.ini
+       line: "{{ item.line }}"
+       state: present
+       create: True
+    with_items:
+        - { line: "#Our Database Connection for MSSQL alias " }
+        - { line: "[MSSQL]" }
+        - { line: "[FreeTDS]" }
+        - { line: "Description = v0.91 with protocol v7.2" }
+        - { line: "Driver = /usr/lib/x86_64-linux-gnu/odbc/libtdsodbc.so" }
+        - { line: "Setup=/usr/lib/i386-linux-gnu/odbc/libtdsS.so" }
+        - { line: "FileUsage = 1" }
+        - { line: "UsageCount = 1" }
+  - name: Configure odbc by creting a new file /etc/odbc.ini 
+    lineinfile: 
+       dest: /etc/odbc.ini
+       line: "{{ item.line }}"
+       state: present
+       create: True
+    with_items:
+        - { line: "#Our Database Connection for MSSQL alias " }
+        - { line: "[MSSQL]" }
+        - { line: "Driver = FreeTDS " }
+        - { line: "ServerName = MSSQL" }
+        - { line: "Port = 1433" }
+        - { line: "TDS_Version = 7.2" }
